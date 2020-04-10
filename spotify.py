@@ -114,7 +114,6 @@ class Spotify():
 
         track_dataframe = pd.DataFrame(
             {'artist_name': artist_name, 'track_name': track_name, 'track_id': track_id, 'popularity': popularity})
-        # print(track_dataframe)
 
         return track_dataframe
 
@@ -143,7 +142,6 @@ class Spotify():
             sp = spotipy.Spotify(auth=token)
             results = sp.user_playlist_create(
                 "mitch.sparrow", playlist_name, public=False)
-            # print(results['id'])
             print("\n\nPlaylist", playlist_name, "created successfully.\n")
         else:
             print("Can't get token for", username)
@@ -197,12 +195,6 @@ class Spotify():
         track_dataframe22 = pd.DataFrame(
             {'artist_name': artist_name, 'track_name': track_name, 'release_date': date_added, 'id': track_id})
         print(track_dataframe22)
-        # response = am._get(
-        #    "https://api.music.apple.com/v1/me/library/playlists/")
-        # print(response)
-        # print(am.token_str)
-
-        # response = requests.get("https://api.music.apple.com/v1/me/library/playlists/")
 
     def getAppleMusicPlaylist(self):
 
@@ -278,37 +270,11 @@ class Spotify():
 
         return playlist_dataframe
 
-    def getAppleMusic2(self):
-
-        alg = 'ES256'
-        iat = int(datetime.utcnow().strftime("%s"))  # set issued at to now
-        # add e.g. 24h from now for expiration (24 * 3600secs == 86400)
-        exp = iat + 86400
-
-        payload = {
-            'iss': apple_team_ID,
-            'iat': iat,
-            'exp': exp
-        }
-
-        headers = {
-            'alg': alg,
-            'kid': apple_key_ID
-        }
-
-        token = jwt.encode(payload, apple_private_key,
-                           algorithm=alg, headers=headers)
-        token_str = token.decode('utf-8')
-
-        url = "https://api.music.apple.com/v1/catalog/us/songs/203709340"
-        print(f"curl -v -H 'Authorization: Bearer {token_str}' {url}")
-
 
 if __name__ == '__main__':
     s = Spotify()
     # dataframe = s.signInUser()
     # s.getAppleMusic(dataframe)
-
     playlist_dataframe = s.getAppleMusicPlaylist()
     spotify_songs_dataframe = s.addSpotifySongs(playlist_dataframe)
     new_playlist_id = s.createSpotifyPlaylist()
