@@ -34,7 +34,11 @@ class Spotify():
                 popularity.append(t['popularity'])
 
         track_dataframe = pd.DataFrame(
-            {'artist_name': artist_name, 'track_name': track_name, 'track_id': track_id, 'popularity': popularity})
+            {'artist_name': artist_name,
+             'track_name': track_name,
+             'track_id': track_id,
+             'popularity': popularity})
+
         print(track_dataframe)
         track_dataframe.head()
 
@@ -53,30 +57,30 @@ class Spotify():
         dataframe_length = apple_dataframe["artist_name"].size
 
         for i in range(0, dataframe_length, 1):
-            query_total = 'artist:' + \
+            query = 'artist:' + \
                 apple_dataframe["artist_name"][i] + \
                 ' track:' + apple_dataframe["track_name"][i]
 
             track_results = sp.search(
-                q=query_total, type='track', limit=1, offset=0)
+                q=query, type='track', limit=1, offset=0)
 
             if int(track_results['tracks']['total']) > 0:
                 print("Found:" + apple_dataframe["track_name"][i])
-                artist_name.append(
-                    track_results['tracks']['items'][0]['artists'][0]['name'])
-                track_name.append(track_results['tracks']['items'][0]['name'])
-
-                track_id.append(track_results['tracks']['items'][0]['id'])
-
-                popularity.append(
-                    track_results['tracks']['items'][0]['popularity'])
+                var = track_results['tracks']['items'][0]
+                artist_name.append(var['artists'][0]['name'])
+                track_name.append(var['name'])
+                track_id.append(var['id'])
+                popularity.append(var['popularity'])
             else:
                 print("Skipped:" + apple_dataframe["track_name"][i])
 
         track_dataframe = pd.DataFrame(
-            {'artist_name': artist_name, 'track_name': track_name, 'track_id': track_id, 'popularity': popularity})
+            {'artist_name': artist_name,
+             'track_name': track_name,
+             'track_id': track_id,
+             'popularity': popularity})
 
-        print("\n\n Equivilent Spotify songs:\n\n")
+        print("\n\n Equivalent Spotify songs:\n\n")
 
         print(track_dataframe)
         track_dataframe.head()
@@ -113,15 +117,17 @@ class Spotify():
             print("Can't get token for", username)
 
         track_dataframe = pd.DataFrame(
-            {'artist_name': artist_name, 'track_name': track_name, 'track_id': track_id, 'popularity': popularity})
+            {'artist_name': artist_name,
+             'track_name': track_name,
+             'track_id': track_id,
+             'popularity': popularity})
 
         return track_dataframe
 
     def createSpotifyPlaylist(self):
         scope = 'user-modify-private playlist-modify-private user-read-currently-playing user-library-read user-read-recently-played user-modify-playback-state playlist-read-collaborative playlist-modify-public playlist-read-private'
 
-        input_user = input(
-            "\nContinue? (1 = yes, 0 = no): ")
+        input_user = input("\nContinue? (1 = yes, 0 = no): ")
 
         if int(input_user) == 0:
             sys.exit()
@@ -141,7 +147,7 @@ class Spotify():
         if token:
             sp = spotipy.Spotify(auth=token)
             results = sp.user_playlist_create(
-                "mitch.sparrow", playlist_name, public=False)
+                username, playlist_name, public=False)
             print("\n\nPlaylist", playlist_name, "created successfully.\n")
         else:
             print("Can't get token for", username)
@@ -182,18 +188,18 @@ class Spotify():
         for i in range(0, 10, 1):
             track_result = am.search(
                 song_dataframe["track_name"][i], types=['songs'], limit=1)
-            # print(track_result['results']['songs'])
-            artist_name.append(track_result['results']['songs']
-                               ['data'][0]['attributes']['artistName'])
-            track_name.append(track_result['results']['songs']
-                              ['data'][0]['attributes']['name'])
-            date_added.append(track_result['results']['songs']
-                              ['data'][0]['attributes']['releaseDate'])
-            track_id.append(track_result['results']['songs']
-                            ['data'][0]['attributes']['playParams']['id'])
+            var = track_result['results']['songs']['data'][0]['attributes']
+            artist_name.append(var['artistName'])
+            track_name.append(var['name'])
+            date_added.append(var['releaseDate'])
+            track_id.append(var['playParams']['id'])
 
         track_dataframe22 = pd.DataFrame(
-            {'artist_name': artist_name, 'track_name': track_name, 'release_date': date_added, 'id': track_id})
+            {'artist_name': artist_name,
+             'track_name': track_name,
+             'release_date': date_added,
+             'id': track_id})
+
         print(track_dataframe22)
 
     def getAppleMusicPlaylist(self):
@@ -213,31 +219,28 @@ class Spotify():
         print("\n\nSearch results for", playlist, ":\n")
 
         secret = open('AuthKey_W9K597H774.p8', 'rb').read()
-
-        am = applemusicpy.AppleMusic(
-            secret, apple_key_ID, apple_team_ID)
+        am = applemusicpy.AppleMusic(secret, apple_key_ID, apple_team_ID)
 
         track_result = am.search(playlist, types=['playlists'], limit=5)
 
-        ii = len(track_result['results']['playlists']
-                 ['data'])
+        ii = len(track_result['results']['playlists']['data'])
 
         if ii > 4:
             ii = 4
 
         for i in range(0, ii, 1):
-
-            playlist_name.append(track_result['results']['playlists']
-                                 ['data'][i]['attributes']['name'])
-            playlist_id.append(track_result['results']['playlists']
-                               ['data'][i]['id'])
-            curator_name.append(track_result['results']['playlists']
-                                ['data'][i]['attributes']['curatorName'])
-            last_date.append(track_result['results']['playlists']
-                             ['data'][i]['attributes']['lastModifiedDate'])
+            var = track_result['results']['playlists']['data'][i]
+            playlist_name.append(var['attributes']['name'])
+            playlist_id.append(var['id'])
+            curator_name.append(var['attributes']['curatorName'])
+            last_date.append(var['attributes']['lastModifiedDate'])
 
         track_dataframe = pd.DataFrame(
-            {'playlist_name': playlist_name, 'curator_name': curator_name, 'ID': playlist_id, 'last_modified':  last_date})
+            {'playlist_name': playlist_name,
+             'curator_name': curator_name,
+             'ID': playlist_id,
+             'last_modified':  last_date})
+
         print(track_dataframe)
 
         selection = input(
@@ -255,17 +258,18 @@ class Spotify():
         ii = len(result['data'][0]['relationships']['tracks']['data'])
 
         for i in range(0, ii, 1):
-            artist_name.append(result['data'][0]['relationships']
-                               ['tracks']['data'][i]['attributes']['artistName'])
-            track_name.append(result['data'][0]['relationships']
-                              ['tracks']['data'][i]['attributes']['name'])
-            date_added.append(result['data'][0]['relationships']
-                              ['tracks']['data'][i]['attributes']['releaseDate'])
-            track_id.append(result['data'][0]['relationships']
-                            ['tracks']['data'][i]['attributes']['playParams']['id'])
+            var = result['data'][0]['relationships']['tracks']['data'][i]['attributes']
+            artist_name.append(var['artistName'])
+            track_name.append(var['name'])
+            date_added.append(var['releaseDate'])
+            track_id.append(var['playParams']['id'])
 
         playlist_dataframe = pd.DataFrame(
-            {'artist_name': artist_name, 'track_name': track_name, 'release_date': date_added, 'id': track_id})
+            {'artist_name': artist_name,
+             'track_name': track_name,
+             'release_date': date_added,
+             'id': track_id})
+
         print(playlist_dataframe)
 
         return playlist_dataframe
